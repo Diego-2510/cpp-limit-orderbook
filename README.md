@@ -37,10 +37,10 @@ Why uint64_t for price?
 Store prices in cents (e.g., $100.50 = 10050) to avoid floating-point precision errors.
 
 ## Roadmap
-Week 1: Order class
-Week 2-3: OrderBook with std::map
-Week 4-5: Matching engine
-Week 6: Benchmark (10k orders target)
+- Week 1: Order class
+- Week 2-3: OrderBook with std::map
+- Week 4-5: Matching engine
+- Week 6: Benchmark (10k orders target)
 
 ## License
 MIT License
