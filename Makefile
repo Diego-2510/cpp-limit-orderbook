@@ -1,10 +1,18 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Iinclude
+CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude
+SRC = src/order.cpp src/orderbook.cpp src/main.cpp
+OBJ = $(SRC:.cpp=.o)
+TARGET = orderbook_test
 
-all: order.o
+all: $(TARGET)
 
-order.o: src/order.cpp
-	$(CXX) $(CXXFLAGS) -c src/order.cpp -o order.o
+$(TARGET): $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o
+	rm -f $(OBJ) $(TARGET)
+
+.PHONY: all clean
