@@ -1,58 +1,91 @@
 # cpp-limit-orderbook
-High-performance Limit Order Book implementation in modern C++.
-
-## Current Status
-Week 2/6 - OrderBook Container Implementation
-- Order class with immutable design ✓
-- OrderBook with std::map-based storage ✓
-- FIFO queues per price level ✓
-- Best bid/ask getters ✓
-- Matching engine (coming Week 4-5)
+High-performance Limit Order Book implementation in modern C++17 with price-time priority matching engine.
 
 ## Features
-- **Order Class:** ID, type (BUY/SELL), price, quantity, timestamp
-- **OrderBook Container:** Map-based storage with FIFO queue per price level
-- **Price-Time Priority:** Bids sorted descending (std::greater), Asks ascending (std::less)
-- **Memory Safety:** unique_ptr ownership, no raw pointers
-- **Modern C++17:** std::chrono timestamps, std::optional, enum class
+
+- **Matching Engine:** Price-time priority (FIFO), partial fills, resting order support
+- **Order Class:** ID, type (BUY/SELL), price in cents, quantity, timestamp,  immutable except `fill()`
+- **OrderBook Container:** `std::map`-based price levels, FIFO queue per level via `std::vector<unique_ptr<Order>>`
+- **Trade Struct:** Captures buy/sell IDs, executed price and quantity per fill
+- **Memory Safety:** `unique_ptr` ownership throughout, no raw pointers
+- **Modern C++17:** `std::optional`, `std::chrono`, `enum class`, structured bindings
 
 ## Tech Stack
+
 - C++17
 - GNU Make
-- std::map for O(log n) price level access
-- std::vector for FIFO queues
+- `std::map`: O(log n) price level access, supports Top-N iteration
+- `std::vector`: FIFO queue per price level
+- `std::unique_ptr`: deterministic memory management
 
-## Build
+## Build & Run
+
 ```bash
 git clone https://github.com/Diego-2510/cpp-limit-orderbook.git
 cd cpp-limit-orderbook
 make
+./orderbook_test
 ```
 
+## Benchmark (10k orders):
+
+make benchmark
+./benchmark
+
+## Project Structure
+
+cpp-limit-orderbook/
+├── include/
+│ ├── order.h # Order class declaration + fill()
+│ ├── orderbook.h # OrderBook with match_order()
+│ └── trade.h # Trade value type
+├── src/
+│ ├── order.cpp
+│ ├── orderbook.cpp # Matching engine implementation
+│ ├── main.cpp # Functional tests
+│ └── benchmark.cpp # 10k order benchmark (Week 5)
+├── Makefile
+└── README.md
+
+
 ## Design Rationale
-**Why immutable Orders?**
-Orders don't change after creation, making them safer for concurrent OrderBook access.
 
-**Why enum class OrderType?**
-Type-safe (no implicit int conversion), minimal memory footprint (1 byte storage).
+**Why `std::map` over `priority_queue`?**
+`priority_queue` only exposes the top element -> no iteration possible. `std::map` allows Top-N display and range iteration at O(log n) insertion. Acceptable for 10k orders.
 
-**Why uint64_t for price?**
-Store prices in cents (e.g., $100.50 = 10050) to avoid floating-point precision errors.
+**Why `std::greater` for bids?**
+Inverts map ordering so `.begin()` returns the highest bid in O(1) without extra logic.
 
-**Why std::map over priority_queue?**
-Map allows iteration over top N price levels (needed for order book display). Priority_queue only provides top element access. O(log n) insertion is acceptable for 10k orders.
+**Why prices in `uint64_t` cents?**
+Avoids floating-point precision errors entirely (e.g. $100.50 → `10050`). Safe for arithmetic without `double` rounding.
 
-**Why std::greater for bids?**
-Bids need highest price first. std::greater inverts map ordering so `.begin()` returns best bid in O(1).
+**Why `unique_ptr` + `fill()` instead of immutable Orders?**
+Full immutability breaks partial fills. `fill()` is the minimal mutation needed -> all other fields stay const-correct via getters only.
+
+**Why FIFO per price level?**
+Standard exchange price-time priority: among orders at the same price, the earliest placed order is matched first. `vector::front()` + `erase(begin())` implements this directly.
+
+## Matching Engine
+
+`match_order(incoming)` executes against the opposing book side:
+- BUY: matches against asks (lowest ask first), condition `incoming.price >= resting.price`
+- SELL: matches against bids (highest bid first), condition `incoming.price <= resting.price`
+- Partial fills: resting order stays in book with reduced quantity
+- Unmatched remainder: placed into book via `add_order()`
+- Returns `std::vector<Trade>` with all executed fills
 
 ## Roadmap
-- Week 1: Order class ✓
-- Week 2-3: OrderBook with std::map ✓
-- Week 4-5: Matching engine
-- Week 6: Benchmark (10k orders target)
+
+- [x] Week 1 - Order class with smart pointers
+- [x] Week 2-3 - OrderBook container, best bid/ask, FIFO queues
+- [x] Week 4 - Matching engine with partial fills
+- [ ] Week 5 - Benchmark: 10k orders, `std::chrono` latency measurement
+- [ ] Week 6 - Final polish, portfolio review
 
 ## License
+
 MIT License
 
 ## Author
+
 Diego Ringleb
