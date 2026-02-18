@@ -13,6 +13,9 @@ $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -f $(OBJ) $(TARGET) benchmark
 
-.PHONY: all clean
+benchmark: src/order.cpp src/orderbook.cpp src/benchmark.cpp
+	$(CXX) $(CXXFLAGS) -O2 -o benchmark $^
+
+.PHONY: all clean benchmark
