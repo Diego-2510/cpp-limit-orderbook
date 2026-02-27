@@ -40,22 +40,6 @@ make benchmark
 
 *Benchmark uses randomized BUY/SELL orders (prices: 95.00-105.00, quantities: 10-100). All orders processed via `match_order()` which handles matching + placement.*
 
-## Project Structure
-
-cpp-limit-orderbook/
-├── include/
-│ ├── order.h # Order class declaration + fill()
-│ ├── orderbook.h # OrderBook with match_order()
-│ └── trade.h # Trade value type
-├── src/
-│ ├── order.cpp
-│ ├── orderbook.cpp # Matching engine implementation
-│ ├── main.cpp # Functional tests
-│ └── benchmark.cpp # 10k order benchmark
-├── Makefile
-└── README.md
-
-
 ## Design Rationale
 
 **Why `std::map` over `priority_queue`?**  
