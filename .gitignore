@@ -1,41 +1,40 @@
-# Prerequisites
-*.d
+# CMake / build output
+build/
+build-*/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+CTestTestfile.cmake
+cmake_install.cmake
+Makefile.cmake
+compile_commands.json
+Testing/
+_deps/
 
-# Compiled Object files
-*.slo
-*.lo
+# Object and library files
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
+*.a
+*.lib
 *.so
 *.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+# Executables / generated binaries
+orderbook_demo
+orderbook_tests
+orderbook_benchmark
+benchmark
+orderbook_test
 *.exe
 *.out
 *.app
 
-# debug information files
-*.dwo
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Benchmark output
+benchmark-results/

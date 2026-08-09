@@ -1,21 +1,27 @@
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude
-SRC = src/order.cpp src/orderbook.cpp src/main.cpp
-OBJ = $(SRC:.cpp=.o)
-TARGET = orderbook_test
+BUILD_DIR ?= build
+RELEASE_BUILD_DIR ?= build-release
 
-all: $(TARGET)
+.PHONY: all configure build test benchmark clean
 
-$(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ)
+all: build
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+configure:
+	cmake -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug
+
+build: configure
+	cmake --build $(BUILD_DIR) --parallel
+
+test: build
+	ctest --test-dir $(BUILD_DIR) --output-on-failure
+
+benchmark:
+	cmake -S . -B $(RELEASE_BUILD_DIR) \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_TESTING=OFF
+	cmake --build $(RELEASE_BUILD_DIR) \
+		--target orderbook_benchmark \
+		--parallel
+	./$(RELEASE_BUILD_DIR)/orderbook_benchmark
 
 clean:
-	rm -f $(OBJ) $(TARGET) benchmark
-
-benchmark: src/order.cpp src/orderbook.cpp src/benchmark.cpp
-	$(CXX) $(CXXFLAGS) -O2 -o benchmark $^
-
-.PHONY: all clean benchmark
+	rm -rf $(BUILD_DIR) $(RELEASE_BUILD_DIR)
