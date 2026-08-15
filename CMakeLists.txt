@@ -171,9 +171,7 @@ if(BUILD_TESTING)
         GIT_REPOSITORY
             https://github.com/google/googletest.git
         GIT_TAG
-            v1.17.0
-        GIT_SHALLOW
-            TRUE
+            52eb8108c5bdec04579160ae17225d66034bd723
     )
 
     set(

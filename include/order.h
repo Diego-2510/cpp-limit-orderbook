@@ -3,10 +3,10 @@
 #include <chrono>
 #include <cstdint>
 
-enum class OrderType { BUY, SELL };
+enum class OrderType : std::uint8_t { BUY, SELL };
 
 class Order {
-public:
+   public:
     Order(uint32_t id, OrderType type, uint64_t price, uint32_t quantity);
 
     [[nodiscard]] uint32_t getId() const noexcept;
@@ -17,7 +17,7 @@ public:
 
     void fill(uint32_t qty);
 
-private:
+   private:
     uint32_t id_;
     OrderType type_;
     uint64_t price_;
