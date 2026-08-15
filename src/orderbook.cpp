@@ -5,13 +5,11 @@
 
 void OrderBook::add_order(std::unique_ptr<Order> order) {
     if (!order) {
-        throw std::invalid_argument(
-            "order must not be null");
+        throw std::invalid_argument("order must not be null");
     }
 
     if (order->getQuantity() == 0) {
-        throw std::invalid_argument(
-            "cannot add a fully filled order to the book");
+        throw std::invalid_argument("cannot add a fully filled order to the book");
     }
 
     const uint64_t price = order->getPrice();
@@ -40,26 +38,18 @@ std::optional<uint64_t> OrderBook::get_best_ask() const {
     return asks_.begin()->first;
 }
 
-std::size_t OrderBook::get_bid_levels() const noexcept {
-    return bids_.size();
-}
+std::size_t OrderBook::get_bid_levels() const noexcept { return bids_.size(); }
 
-std::size_t OrderBook::get_ask_levels() const noexcept {
-    return asks_.size();
-}
+std::size_t OrderBook::get_ask_levels() const noexcept { return asks_.size(); }
 
-std::vector<Trade> OrderBook::match_order(
-    std::unique_ptr<Order> incoming) {
-
+std::vector<Trade> OrderBook::match_order(std::unique_ptr<Order> incoming) {
     if (!incoming) {
-        throw std::invalid_argument(
-            "incoming order must not be null");
+        throw std::invalid_argument("incoming order must not be null");
     }
 
     std::vector<Trade> trades;
 
-    const bool is_buy =
-        incoming->getType() == OrderType::BUY;
+    const bool is_buy = incoming->getType() == OrderType::BUY;
 
     while (incoming->getQuantity() > 0) {
         if (is_buy) {
@@ -75,23 +65,14 @@ std::vector<Trade> OrderBook::match_order(
 
             auto& queue = level_it->second;
 
-            while (
-                incoming->getQuantity() > 0 &&
-                !queue.empty()) {
-
+            while (incoming->getQuantity() > 0 && !queue.empty()) {
                 auto& resting = queue.front();
 
                 const uint32_t traded_qty =
-                    std::min(
-                        incoming->getQuantity(),
-                        resting->getQuantity());
+                    std::min(incoming->getQuantity(), resting->getQuantity());
 
                 trades.push_back(
-                    Trade{
-                        incoming->getId(),
-                        resting->getId(),
-                        level_it->first,
-                        traded_qty});
+                    Trade{incoming->getId(), resting->getId(), level_it->first, traded_qty});
 
                 incoming->fill(traded_qty);
                 resting->fill(traded_qty);
@@ -117,23 +98,14 @@ std::vector<Trade> OrderBook::match_order(
 
             auto& queue = level_it->second;
 
-            while (
-                incoming->getQuantity() > 0 &&
-                !queue.empty()) {
-
+            while (incoming->getQuantity() > 0 && !queue.empty()) {
                 auto& resting = queue.front();
 
                 const uint32_t traded_qty =
-                    std::min(
-                        incoming->getQuantity(),
-                        resting->getQuantity());
+                    std::min(incoming->getQuantity(), resting->getQuantity());
 
                 trades.push_back(
-                    Trade{
-                        resting->getId(),
-                        incoming->getId(),
-                        level_it->first,
-                        traded_qty});
+                    Trade{resting->getId(), incoming->getId(), level_it->first, traded_qty});
 
                 incoming->fill(traded_qty);
                 resting->fill(traded_qty);
