@@ -1,6 +1,7 @@
 Checks: >
   -*,
   bugprone-*,
+  -bugprone-easily-swappable-parameters,
   performance-*,
   portability-*,
   modernize-use-nullptr

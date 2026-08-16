@@ -12,7 +12,7 @@
 #include "trade.h"
 
 class OrderBook {
-public:
+   public:
     OrderBook() = default;
 
     void add_order(std::unique_ptr<Order> order);
@@ -25,12 +25,8 @@ public:
 
     std::vector<Trade> match_order(std::unique_ptr<Order> incoming);
 
-private:
-    std::map<
-        uint64_t,
-        std::vector<std::unique_ptr<Order>>,
-        std::greater<uint64_t>>
-        bids_;
+   private:
+    std::map<uint64_t, std::vector<std::unique_ptr<Order>>, std::greater<uint64_t>> bids_;
 
     std::map<uint64_t, std::vector<std::unique_ptr<Order>>> asks_;
 };
